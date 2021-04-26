@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slider</title>
+</head>
+<body>
+  <style>
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 500px;
+        margin: 0 auto;
+    }
+
+    .slider {
+        border: 1px solid red;
+        margin: 100px auto;
+        position: relative;
+        padding: 10px;
+    }
+
+    .slider__stator {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .slider-rotor {
+        display: flex;
+        transition: .4s transform;
+    }
+
+    .card {
+        height: 200px;
+        width: 400px;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 25px;
+        background: #963;
+        margin: 0 auto;
+    }
+
+    .slide {
+        height: auto;
+        background: #ccc;
+        border: 2px solid #000;
+        box-sizing: border-box;
+        display: inline-block;
+        flex: 1 0 100%;
+    }
+
+    .control {
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        background: #369;
+        top: calc(50% - 10px);
+    }
+
+    .left {
+        left: -10px;
+    }
+
+    .right {
+        right: -10px;
+    }
+
+    .no-transition {
+        transition: 1ms transform;
+    }
+</style>
+
+<div class="container">
+    <div class="slider">
+        <div class="slider__stator">
+            <div class="slider-rotor">
+                <div class="slide">
+                    <div class="card">1</div>
+                </div>
+                <div class="slide">
+                    <div class="card">2</div>
+                </div>
+                <div class="slide">
+                    <div class="card">3</div>
+                </div>
+                <div class="slide">
+                    <div class="card">4</div>
+                </div>
+                <div class="slide">
+                    <div class="card">5</div>
+                </div>
+                <div class="slide">
+                    <div class="card">6</div>
+                </div>
+            </div>
+        </div>
+        <div class="control left"></div>
+        <div class="control right"></div>
+    </div>
+</div>
+
+<script>
+  const left = document.querySelector('.left');
+  const right = document.querySelector('.right');
+  const rotor = document.querySelector('.slider-rotor');
+  const slidesLen = document.querySelectorAll('.slide').length;
+  rotor.addEventListener('transitionend', () => isSlideMoving = false);
+  left.addEventListener('click', onControlClicked.bind(null, false))
+  right.addEventListener('click', onControlClicked.bind(null, true));
+  let isSlideMoving = false;
+  let currentSlideIndex = 0;
+
+  const slideForward = () => {
+    currentSlideIndex++;
+    translateSlideByIndex(currentSlideIndex);
+  }
+
+  const slideBack = () => {
+    currentSlideIndex--;
+    translateSlideByIndex(currentSlideIndex)
+  }
+
+  const toggleTransition = () => rotor.classList.toggle('no-transition');
+
+  const translateSlideByIndex = (index) => rotor.style.transform = `translate(${index * 100}%)`;
+
+  const setRightPaddingSlideIndex = () => currentSlideIndex = -1 * slidesLen;
+
+  const setLeftPaddingSlideIndex = () => currentSlideIndex = 1;
+
+  const onSlideForward = () => {
+    if (currentSlideIndex === 0) {
+      setRightPaddingSlideIndex();
+      callSlideActionOnNextRender(slideForward)
+    } else {
+      slideForward();
+    }
+  }
+
+  const callSlideActionOnNextRender = (slideAction = () => {
+  }) => {
+    toggleTransition();
+    translateSlideByIndex(currentSlideIndex);
+    requestAnimationFrame(() => {
+      toggleTransition();
+      slideAction();
+    });
+  }
+
+  const onSlideBack = () => {
+    if (Math.abs(currentSlideIndex) === slidesLen - 1) {
+      setLeftPaddingSlideIndex();
+      callSlideActionOnNextRender(slideBack)
+    } else {
+      slideBack();
+    }
+  }
+
+  function onControlClicked(moveForward = true) {
+    if (isSlideMoving) return;
+    isSlideMoving = true;
+
+    requestAnimationFrame(() => {
+      if (moveForward) {
+        onSlideForward();
+      } else {
+        onSlideBack();
+      }
+    })
+  }
+
+</script>
+
+</body>
+</html>
